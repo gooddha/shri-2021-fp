@@ -22,6 +22,7 @@ import {
     equals,
     length,
     lte,
+    not,
     partial,
     propEq,
     values,
@@ -31,74 +32,63 @@ const isGreen = equals('green');
 const isRed = equals('red');
 const isBlue = equals('blue');
 const isOrange = equals('orange');
-
+const isWhite = equals('white');
 
 const filterGreen = filter(isGreen);
 const filterRed = filter(isRed);
 const filterBlue = filter(isBlue);
-const filterOrange = filter(isOrange);
+const filterWhite = filter(isWhite);
 
 const getGreenCount = compose(length, filterGreen, values);
 const getRedCount = compose(length, filterRed, values);
 const getBlueCount = compose(length, filterBlue, values);
-const getOrangeCount = compose(length, filterOrange, values);
+const getWhiteCount = compose(length, filterWhite, values);
 
 const atLeastTwo = partial(lte, [2]);
 const atLeastOne = partial(lte, [1]);
 
+const anyRed = compose(atLeastOne, getRedCount);
+const atLeastTwoGreen = compose(atLeastTwo, getGreenCount);
+const atLeastTwoWhite = compose(atLeastTwo, getWhiteCount);
+const isTriangleGreen = propEq('triangle', 'green');
+const isSquareGreen = propEq('square', 'green');
+const isAllOrange = all(isOrange);
+const isAllGreen = all(isGreen);
+
+const isCircleBlue = propEq('circle', 'blue');
+const isStarRed = propEq('star', 'red');
+const isStarWhite = propEq('star', 'white');
+const isOrangeSquare = propEq('square', 'orange');
+
+const isStarNotRed = compose(not, isStarRed)
+const isStarNotWhite = compose(not, isStarWhite)
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
-export const validateFieldN1 = ({ star, square, triangle, circle }) => {
-    if (triangle !== 'white' || circle !== 'white') {
-        return false;
-    }
-    return isRed(star) && isGreen(square);
-};
+export const validateFieldN1 = allPass([atLeastTwoWhite, isStarRed, isSquareGreen])
 
 // 2. Как минимум две фигуры зеленые.
-export const validateFieldN2 = (figures) => {
-    return compose(atLeastTwo, getGreenCount)(figures);
-};
+export const validateFieldN2 = atLeastTwoGreen;
 
 // 3. Количество красных фигур равно кол-ву синих.
-export const validateFieldN3 = (figures) => {
-    return converge(equals, [getRedCount, getBlueCount])(figures)
-};
+export const validateFieldN3 = converge(equals, [getRedCount, getBlueCount])
 
 // 4. Синий круг, красная звезда, оранжевый квадрат
-export const validateFieldN4 = (figures) => {
-    const isBlueCircle = propEq('circle', 'blue');
-    const isRedStar = propEq('star', 'red');
-    const isOrangeSquare = propEq('square', 'orange');
-
-    return allPass([isBlueCircle, isRedStar, isOrangeSquare])(figures);
-};
-
+export const validateFieldN4 = allPass([isCircleBlue, isStarRed, isOrangeSquare]);
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
-export const validateFieldN5 = () => {
-    return allPass()
-};
+export const validateFieldN5 = () => false
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
-export const validateFieldN6 = (figures) => {
-    const anyRed = compose(atLeastOne, getRedCount);
-    const isGreenTriangle = propEq('triangle', 'green');
-    const atLeastTwoGreen = compose(atLeastTwo, getGreenCount);
-
-    return allPass([anyRed, atLeastTwoGreen, isGreenTriangle])(figures);
-};
+export const validateFieldN6 = allPass([anyRed, atLeastTwoGreen, isTriangleGreen]);
 
 // 7. Все фигуры оранжевые.
-export const validateFieldN7 = (figures) => {
-    return all(getOrangeCount(figures)) === values(figures).length;
-};
+export const validateFieldN7 = compose(isAllOrange, values);
 
 // 8. Не красная и не белая звезда.
-export const validateFieldN8 = () => false;
+export const validateFieldN8 = allPass([isStarNotRed, isStarNotWhite])
 
 // 9. Все фигуры зеленые.
-export const validateFieldN9 = () => false;
+export const validateFieldN9 = compose(isAllGreen, values);
 
 // 10. Треугольник и квадрат одного цвета (не белого)
-export const validateFieldN10 = () => false;
+export const validateFieldN10 = () => false
