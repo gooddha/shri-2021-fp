@@ -49,10 +49,12 @@ const getBlueCount = compose(length, filterBlue, values);
 const getOrangeCount = compose(length, filterOrange, values);
 
 const single = partial(equals, [1]);
+const double = partial(equals, [2]);
 const atLeastTwo = partial(lte, [2]);
 const atLeastThree = partial(lte, [3]);
 
 const singleRed = compose(single, getRedCount);
+const doubleGreen = compose(double, getGreenCount);
 const atLeastTwoGreen = compose(atLeastTwo, getGreenCount);
 const atLeastTwoWhite = compose(atLeastTwo, getWhiteCount);
 const atLeastThreeGreen = compose(atLeastThree, getGreenCount);
@@ -101,7 +103,7 @@ export const validateFieldN4 = allPass([isCircleBlue, isStarRed, isOrangeSquare]
 export const validateFieldN5 = anyPass([atLeastThreeGreen, atLeastThreeRed, atLeastThreeBlue, atLeastThreeOrange]);
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
-export const validateFieldN6 = allPass([singleRed, atLeastTwoGreen, isTriangleGreen]);
+export const validateFieldN6 = allPass([singleRed, doubleGreen, isTriangleGreen]);
 
 // 7. Все фигуры оранжевые.
 export const validateFieldN7 = compose(isAllOrange, values);
