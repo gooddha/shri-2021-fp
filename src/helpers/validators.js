@@ -16,6 +16,7 @@
 import {
     all,
     allPass,
+    anyPass,
     compose,
     converge,
     filter,
@@ -35,22 +36,30 @@ const isBlue = equals('blue');
 const isOrange = equals('orange');
 const isWhite = equals('white');
 
+const filterWhite = filter(isWhite);
 const filterGreen = filter(isGreen);
 const filterRed = filter(isRed);
 const filterBlue = filter(isBlue);
-const filterWhite = filter(isWhite);
+const filterOrange = filter(isOrange);
 
+const getWhiteCount = compose(length, filterWhite, values);
 const getGreenCount = compose(length, filterGreen, values);
 const getRedCount = compose(length, filterRed, values);
 const getBlueCount = compose(length, filterBlue, values);
-const getWhiteCount = compose(length, filterWhite, values);
+const getOrangeCount = compose(length, filterOrange, values);
 
-const atLeastTwo = partial(lte, [2]);
 const atLeastOne = partial(lte, [1]);
+const atLeastTwo = partial(lte, [2]);
+const atLeastThree = partial(lte, [3]);
 
 const anyRed = compose(atLeastOne, getRedCount);
 const atLeastTwoGreen = compose(atLeastTwo, getGreenCount);
 const atLeastTwoWhite = compose(atLeastTwo, getWhiteCount);
+const atLeastThreeGreen = compose(atLeastThree, getGreenCount);
+const atLeastThreeRed = compose(atLeastThree, getRedCount);
+const atLeastThreeBlue = compose(atLeastThree, getBlueCount);
+const atLeastThreeOrange = compose(atLeastThree, getOrangeCount);
+
 const isTriangleGreen = propEq('triangle', 'green');
 const isSquareGreen = propEq('square', 'green');
 const isAllOrange = all(isOrange);
@@ -89,7 +98,7 @@ export const validateFieldN3 = converge(equals, [getRedCount, getBlueCount])
 export const validateFieldN4 = allPass([isCircleBlue, isStarRed, isOrangeSquare]);
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
-export const validateFieldN5 = () => false
+export const validateFieldN5 = anyPass([atLeastThreeGreen, atLeastThreeRed, atLeastThreeBlue, atLeastThreeOrange]);
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
 export const validateFieldN6 = allPass([anyRed, atLeastTwoGreen, isTriangleGreen]);
