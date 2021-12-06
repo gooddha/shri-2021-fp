@@ -24,6 +24,7 @@ import {
     lte,
     not,
     partial,
+    prop,
     propEq,
     values,
 } from 'ramda';
@@ -59,9 +60,21 @@ const isCircleBlue = propEq('circle', 'blue');
 const isStarRed = propEq('star', 'red');
 const isStarWhite = propEq('star', 'white');
 const isOrangeSquare = propEq('square', 'orange');
+const isSquareWhite = propEq('square', 'white');
+const isTriangleWhite = propEq('triangle', 'white');
+const isStarNotRed = compose(not, isStarRed);
 
-const isStarNotRed = compose(not, isStarRed)
-const isStarNotWhite = compose(not, isStarWhite)
+const isSquareNotWhite = compose(not, isSquareWhite);
+const isStarNotWhite = compose(not, isStarWhite);
+const isTriangleNotWhite = compose(not, isTriangleWhite);
+
+
+const getSquareColor = prop('square');
+const getTriangleColor = prop('triangle');
+const isSquareHasSameColorAsTriangle = converge(equals, [getSquareColor, getTriangleColor]);
+const isSquareAndTriangleNotWhite = allPass([isSquareNotWhite, isTriangleNotWhite]);
+
+
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
 export const validateFieldN1 = allPass([atLeastTwoWhite, isStarRed, isSquareGreen])
@@ -91,4 +104,4 @@ export const validateFieldN8 = allPass([isStarNotRed, isStarNotWhite])
 export const validateFieldN9 = compose(isAllGreen, values);
 
 // 10. Треугольник и квадрат одного цвета (не белого)
-export const validateFieldN10 = () => false
+export const validateFieldN10 = allPass([isSquareHasSameColorAsTriangle, isSquareAndTriangleNotWhite])
